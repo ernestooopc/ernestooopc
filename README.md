@@ -53,3 +53,6 @@ Here are some ideas to get you started:
 Github stats:
 
 ![GitHub stats](https://github-readme-stats.vercel.app/api?username=ernestooopc&show_icons=true&theme=tokyonight)
+
+##
+[![trophy](https://github-profile-trophy.vercel.app/?username=ernestooopc)](https://github.com/ryo-ma/github-profile-trophy)
