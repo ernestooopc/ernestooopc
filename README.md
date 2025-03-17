@@ -53,8 +53,8 @@ Here are some ideas to get you started:
 Github stats:
 
 ![GitHub stats](https://github-readme-stats.vercel.app/api?username=ernestooopc&show_icons=true&theme=tokyonight)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=ernestooopc&layout=compact&langs_count=6&theme=radical)
 
 ##
 [![trophy](https://github-profile-trophy.vercel.app/?username=ernestooopc)](https://github.com/ryo-ma/github-profile-trophy)
-![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=ernestooopc&layout=compact&langs_count=6&theme=radical)
 
