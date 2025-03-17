@@ -56,3 +56,5 @@ Github stats:
 
 ##
 [![trophy](https://github-profile-trophy.vercel.app/?username=ernestooopc)](https://github.com/ryo-ma/github-profile-trophy)
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=ernestooopc&layout=compact&langs_count=6&theme=radical)
+
