@@ -1,4 +1,4 @@
-<h1 align="center">📜 DSpace Handle Server – Bitácora de Diagnóstico y Corrección</h1> <p align="center"> <strong>Servidor:</strong> srvdspace (WSP01) • <strong>Fecha:</strong> 15/11/2025 • <strong>Técnicos:</strong> Aldo / Danmer </p>
+<h1 align="center">📜 DSpace Handle Server – Bitácora de Diagnóstico y Corrección</h1> <p align="center"> <strong>Servidor:</strong> srvdspace (WSP01) • <strong>Fecha:</strong> 15/11/2025 • <strong>Técnicos:</strong> Aldo</p>
 🧩 Fase 1: Conexión Inicial al Servidor
 
 🔌 Identificación de IP (Tailscale):
