@@ -1,103 +1,123 @@
-📜 Bitácora de Diagnóstico y Corrección: DSpace Handle Server (srvdspace)
+📜 Bitácora de Diagnóstico y Corrección
+DSpace Handle Server – Servidor srvdspace (WSP01)
 
 🗓️ Fecha: 15 de Noviembre de 2025
-
 👤 Técnico: Aldo / Danmer
+📡 Servicio afectado: Handle System (Prefijo 20.500.13097)
 
-🖥️ Servidor: srvdspace (Alias WSP01)
+🧩 Fase 1: Conexión Inicial al Servidor
 
-📡 Servicio Afectado: Handle System (Prefijo 20.500.13097)
+Identificación de IP Tailscale:
 
-Fase 1: 🔌 Conexión Inicial al Servidor
+100.90.157.8
 
-Se establece la conexión al servidor WSP01 para el diagnóstico inicial.
 
-Identificación de IP (Tailscale): Se identifica la IP de la máquina WSP01 en la red de Tailscale: 100.90.157.8.
+Conexión SSH al servidor:
 
-Conexión SSH: Se realiza una conexión SSH exitosa al servidor utilizando la IP de Tailscale para obtener acceso a la terminal.
+ssh danmer@100.90.157.8
 
-Comando: ssh danmer@100.90.157.8
 
-Verificación de Servidor: Se confirma el acceso al servidor WSP01 (Debian GNU/Linux).
+Resultado:
+✔ Acceso correcto al servidor WSP01 (Debian GNU/Linux).
 
-Fase 2: 🚨 Diagnóstico y Resolución de Crisis de Disco
+🚨 Fase 2: Diagnóstico y Resolución de Crisis de Disco
 
-Inmediatamente después de la conexión, se identifica una inestabilidad crítica del sistema causada por la saturación del disco duro principal.
-
-Comando:
+Verificación del uso de disco:
 
 df -h
 
 
-🎯 Diagnóstico: La partición raíz (/dev/mapper/ubuntu--vg-ubuntu--lv) estaba al 100% de su capacidad (93 GB usados de 98 GB).
+Diagnóstico:
+La partición raíz estaba al 100% de capacidad:
+/dev/mapper/ubuntu--vg-ubuntu--lv → 93 GB usados de 98 GB.
 
-🔍 Investigación:
-
-Comando:
-
+🔎 Investigación de directorios pesados
 sudo du -h /dspace --max-depth=1 | sort -hr
 
 
-🎯 Hallazgo: Se identificó que la carpeta /dspace/log era la principal responsable, consumiendo 41 GB.
+✔ Se encontró que /dspace/log ocupaba 41 GB.
 
-🧹 Acción de Limpieza:
+🧹 Limpieza de logs antiguos
 
-Se detuvo el servicio Tomcat: sudo systemctl stop tomcat9.
+Detener Tomcat:
 
-Se ejecutó una limpieza de logs antiguos (anteriores a agosto de 2025).
+sudo systemctl stop tomcat9
 
-Comando:
+
+Eliminar logs anteriores a agosto 2025:
 
 sudo find /dspace/log -type f -mtime +107 -delete
 
 
-✅ Resultado: El tamaño de /dspace/log se redujo de 41 GB a 11 GB, liberando ~30 GB. El uso de disco (df -h) se normalizó.
+Verificación:
+✔ /dspace/log redujo de 41 GB → 11 GB
+✔ Se liberaron ~30 GB.
 
-🔄 Acción: Se reinició el servicio Tomcat: sudo systemctl start tomcat9.
+Reiniciar Tomcat:
 
-Fase 3: 🔧 Diagnóstico del Servicio Handle (Enlace de Red)
+sudo systemctl start tomcat9
 
-Una vez resuelto el problema de disco, la conectividad del Handle Server seguía fallando.
+🔧 Fase 3: Diagnóstico del Servicio Handle (Problema de Enlace)
 
-Comando:
+Verificación de puertos:
 
 sudo netstat -tulnp | grep '2641\|8000'
 
 
-🎯 Diagnóstico: Se descubrió que el proceso Java del Handle Server (PID 8988) estaba enlazado (escuchando) exclusivamente a la IP privada interna (192.168.0.17).
+Diagnóstico:
+El proceso Java del Handle Server estaba escuchando solo en la IP interna:
 
-🛑 Conclusión: Esta configuración impedía que el servidor aceptara conexiones de cualquier otra interfaz (Tailscale, NAT pública).
+192.168.0.17
 
-Fase 4: 🛠️ Corrección del Enlace (Bind Address) y Configuración
 
-Se procedió a corregir la configuración del Handle Server para que aceptara conexiones de todas las interfaces.
+🛑 Esto impedía conexiones externas (Tailscale / IP pública).
 
-🗄️ Backup: Se realizó una copia de seguridad del archivo de configuración binario:
-
+🛠️ Fase 4: Corrección del Bind Address del Handle Server
+📂 Backup de configuración
 sudo cp /dspace/handle-server/config.dct /dspace/handle-server/config.dct.respaldo
 
-✏️ Edición de Configuración: Se editó el archivo config.dct (o su fuente) para cambiar las tres (3) instancias de bind_address de "192.168.0.17" a "0.0.0.0".
+✏️ Ajuste de configuración
 
-🔑 Re-configuración de Prefijo: Se ejecutó el script de DSpace para asegurar que las llaves y el prefijo (20.500.13097) estuvieran correctamente generados y firmados.
+Se editaron las 3 instancias de:
 
+bind_address = "192.168.0.17"
+
+
+por:
+
+bind_address = "0.0.0.0"
+
+🔑 Reconfiguración del prefijo
 /dspace/bin/make-handle-config
 
-🔄 Reinicio del Servicio:
+🔄 Reinicio del servidor Handle
 
-Se detuvo el proceso Java antiguo (PID 85825) con sudo kill 85825.
+Detener el proceso antiguo:
 
-Se reinició el servicio manualmente con el comando completo en segundo plano:
-
-nohup java -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -classpath /dspace/lib/*:/dspace/config -Ddspace.log.init.disable=true -Dlog4j.configuration=log4j-handle-plugin.properties net.handle.server.Main /dspace/handle-server &
+sudo kill 85825
 
 
-🔬 Verificación Final del Servidor:
+Levantar el Handle Server nuevamente:
 
-Comando:
+nohup java -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom \
+-classpath /dspace/lib/*:/dspace/config -Ddspace.log.init.disable=true \
+-Dlog4j.configuration=log4j-handle-plugin.properties \
+net.handle.server.Main /dspace/handle-server &
 
+🔬 Verificación final
 sudo netstat -tulnp | grep '2641\|8000'
 
 
-✅ Resultado: ÉXITO. El nuevo proceso Java escucha en :::2641 y :::8000 (modo dual-stack, aceptando IPv4 en 0.0.0.0).
+Resultado:
+✔ Proceso Java escuchando correctamente en:
 
-(Fin de las fases de corrección del servidor)
+:::2641
+:::8000
+
+
+Aceptando conexiones IPv4/IPv6 y todas las interfaces (0.0.0.0).
+
+Estado Final:
+
+El Handle Server quedó operativo en todas las redes (Tailscale, LAN y pública).
+El servidor recuperó su estabilidad tras liberar espacio en disco.
