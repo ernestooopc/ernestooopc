@@ -1,6 +1,6 @@
 <h1 align="center">📜 DSpace Handle Server – Bitácora de Diagnóstico y Corrección</h1> <p align="center"> <strong>Servidor:</strong> srvdspace (WSP01) • <strong>Fecha:</strong> 15/11/2025 • <strong>Técnico:</strong> Aldo </p>
 
-🧩 Fase 1: Conexión Inicial al Servidor
+## 🧩 Fase 1: Conexión Inicial al Servidor
 
 🔌 Identificación de IP (Tailscale):
 
@@ -14,7 +14,7 @@ ssh danmer@100.90.157.8
 ✔ Resultado:
 Acceso exitoso al servidor WSP01 (Debian GNU/Linux).
 
-🚨 Fase 2: Diagnóstico y Resolución del Problema de Disco
+## 🚨 Fase 2: Diagnóstico y Resolución del Problema de Disco
 
 📦 Verificación del uso del disco:
 
@@ -43,9 +43,6 @@ sudo systemctl stop tomcat9
 Eliminar logs antiguos
 
 sudo find /dspace/log -type f -mtime +107 -delete
-sudo find /dspace/log -name "*.gz" -delete
-sudo truncate -s 0 /dspace/log/dspace.log
-sudo truncate -s 0 /dspace/log/handle-server.log
 
 
 Revisar nuevamente el espacio
@@ -63,7 +60,7 @@ sudo systemctl start tomcat9
 Espacio liberado: ~30 GB
 /dspace/log bajó de 41 GB → 11 GB.
 
-🔧 Fase 3: Diagnóstico del Handle Server
+## 🔧 Fase 3: Diagnóstico del Handle Server
 
 🔍 Verificación de puertos (2641 y 8000):
 
@@ -79,7 +76,7 @@ El proceso Java del Handle Server solo estaba escuchando en:
 
 🛑 Esto impedía recibir conexiones desde fuera.
 
-🛠️ Fase 4: Corrección del Bind Address y Reinicio del Servicio
+## 🛠️ Fase 4: Corrección del Bind Address y Reinicio del Servicio
 
 📂 Backup de configuración
 
